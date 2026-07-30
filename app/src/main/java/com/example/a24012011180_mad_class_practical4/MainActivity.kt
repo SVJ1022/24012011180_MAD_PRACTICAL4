@@ -2,6 +2,7 @@ package com.example.a24012011180_mad_class_practical4
 
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,14 +25,14 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        textAlarm = findViewById<TextView>(R.id.textAlarm)
-        cardSetAlarm = findViewById(card_list_alarm)
+        textAlarm = findViewById<TextView>(R.id.textView8)
+        cardSetAlarm = findViewById(R.id.MaterialCardView2)
         cardSetAlarm.visibility = View.GONE //MOST IMP THIS WILL HIDE THE CARD IF ALARM IS NOT SET!
         findViewById<MaterialButton>(R.id.set_alarm_btn).setOnClickListener {
             showTimeDialog()
         }
         findViewById<MaterialButton>(R.id.cancel_alarm_btn).setOnClickListener {
-
+            cardSetAlarm.visibility = View.GONE
         }
     }
 
@@ -46,5 +47,6 @@ class MainActivity : AppCompatActivity() {
     }
     private fun sendDialogDataToActivity(hour:Int, minute:Int){
 
+        cardSetAlarm.visibility = View.VISIBLE
     }
 }
