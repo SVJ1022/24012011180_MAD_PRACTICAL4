@@ -1,182 +1,394 @@
-# ⏰ Practical-4 --- Android Alarm using Service & BroadcastReceiver
+# ⏰ Practical-4 — Android Alarm using Service & BroadcastReceiver
 
-> **Aim:** Create an Android Alarm application by using service &
-> BroadcastReceiver.
+> **Aim:** Create an Android Alarm application using **Service** and **BroadcastReceiver**.
 
-------------------------------------------------------------------------
+---
 
 ## 🎯 Objective
 
-This practical demonstrates the creation of an Android Alarm application
-using **Service** and **BroadcastReceiver**.
+This practical implements an Android alarm application in Kotlin. The application allows the user to select an alarm time, schedule the alarm, display the selected alarm in the UI, and cancel the alarm.
 
-The application allows the user to:
+The implementation is divided into three important parts:
 
--   View the current digital time
--   Select an alarm time
--   Create an alarm
--   Cancel an alarm
+- `MainActivity` — handles the user interface and alarm scheduling.
+- `AlarmBroadcastReceiver` — receives the alarm broadcast and controls the service.
+- `AlarmService` — starts and stops the alarm sound using `MediaPlayer`.
 
-------------------------------------------------------------------------
+The repository also uses `AlarmManager`, `PendingIntent`, `TimePickerDialog`, `Calendar`, Material components and the `SCHEDULE_EXACT_ALARM` permission. citeturn0view0turn5view0turn5view1
 
-## 📋 Practical Requirements
+---
 
-The practical specifies the following development tasks:
+## 📂 Project Structure
 
-1.  Create `MainActivity` according to the given UI design.
-2.  Create `AlarmBroadcastReceiver` class.
-3.  Create `AlarmService` class.
-4.  Add `android.permission.SCHEDULE_EXACT_ALARM` permission in the
-    Manifest file.
-
-------------------------------------------------------------------------
-
-## 🧩 Main Components
-
-### 1. MainActivity
-
-`MainActivity` provides the main UI for creating and cancelling an alarm
-and displaying the current time.
-
-### 2. AlarmBroadcastReceiver
-
-`AlarmBroadcastReceiver` receives the alarm broadcast when the scheduled
-alarm is triggered.
-
-### 3. AlarmService
-
-`AlarmService` is used to perform the service-related operation
-associated with the alarm.
-
-### 4. AlarmManager
-
-`AlarmManager` is used to schedule the alarm with the Android system.
-
-### 5. PendingIntent
-
-`PendingIntent` represents the operation that should be performed when
-the alarm is triggered.
-
-------------------------------------------------------------------------
-
-## 🕐 TimePickerDialog
-
-A `TimePickerDialog` is used to select the required alarm hour and
-minute.
-
-The selected time can then be stored using the `Calendar` class for
-scheduling the alarm.
-
-------------------------------------------------------------------------
-
-## 🔄 Alarm Application Flow
-
-``` text
-                  MainActivity
-                       │
-                       ▼
-              Select Alarm Time
-                       │
-                       ▼
-               TimePickerDialog
-                       │
-                       ▼
-                    Calendar
-                       │
-                       ▼
-                 AlarmManager
-                       │
-                       ▼
-                 PendingIntent
-                       │
-                       ▼
-            AlarmBroadcastReceiver
-                       │
-                       ▼
-                  AlarmService
-                       │
-                       ▼
-                 Alarm Action
+```text
+24012011180_MAD_PRACTICAL4/
+│
+├── app/
+│   └── src/
+│       ├── main/
+│       │   ├── java/
+│       │   │   └── com/example/
+│       │   │       └── a24012011180_mad_class_practical4/
+│       │   │           ├── MainActivity.kt
+│       │   │           ├── AlarmBroadcastReceiver.kt
+│       │   │           └── AlarmService.kt
+│       │   │
+│       │   ├── res/
+│       │   │   ├── drawable/
+│       │   │   ├── layout/
+│       │   │   ├── raw/
+│       │   │   └── values/
+│       │   │
+│       │   └── AndroidManifest.xml
+│       │
+│       └── ...
+│
+├── gradle/
+├── .gitignore
+├── build.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── settings.gradle.kts
+└── README.md
 ```
 
-------------------------------------------------------------------------
+The repository currently contains `MainActivity.kt`, `AlarmBroadcastReceiver.kt`, and `AlarmService.kt` in the application package, with `activity_main.xml` under the layout resources. citeturn4view0turn6view3
 
-## 🔐 Android Manifest Permission
+---
 
-The practical requires the following permission in the Android Manifest:
+# 🧩 Main Components
 
-``` xml
-<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+## 1. MainActivity
+
+`MainActivity` is responsible for the alarm UI and the complete scheduling/cancellation flow.
+
+When the Activity is created, it:
+
+- Enables Edge-to-Edge display.
+- Loads `activity_main`.
+- Applies system-bar insets.
+- Finds the alarm TextView and alarm card.
+- Initially hides the alarm card.
+- Adds a listener to the **Set Alarm** button.
+- Adds a listener to the **Cancel Alarm** button. citeturn7view0
+
+### Initial Alarm Card
+
+The project explicitly hides the card until an alarm is successfully scheduled:
+
+```kotlin
+cardSetAlarm.visibility = View.GONE
 ```
 
-------------------------------------------------------------------------
+After a successful alarm setup, the selected time is displayed and the card becomes visible. citeturn7view0
 
-## 🛠️ Development Steps
+---
 
-1.  Create `MainActivity` according to the given UI design.
-2.  Create the `AlarmBroadcastReceiver` class.
-3.  Create the `AlarmService` class.
-4.  Add the required alarm permission in the Manifest file.
-5.  Add the digital clock/current time display.
-6.  Add the **Create Alarm** button.
-7.  Use `TimePickerDialog` to select the alarm time.
-8.  Use `Calendar` to prepare the selected time.
-9.  Create a `PendingIntent`.
-10. Use `AlarmManager` to schedule the alarm.
-11. Receive the alarm using `AlarmBroadcastReceiver`.
-12. Start the required `AlarmService`.
-13. Add the **Cancel Alarm** operation.
-14. Test creating and cancelling an alarm.
+# 🕐 Selecting an Alarm Time
 
-------------------------------------------------------------------------
+The application uses `TimePickerDialog` to allow the user to select the alarm hour and minute.
 
-## 📚 Concepts Covered
+```kotlin
+val picker = TimePickerDialog(
+    this,
+    { tp, sHour, sMinute ->
+        sendDialogDataToActivity(sHour, sMinute)
+    },
+    hrs,
+    mns,
+    false
+)
 
--   `BroadcastReceiver`
--   `Service`
--   `TextClock`
--   `TimePickerDialog`
--   `Calendar`
--   `SimpleDateFormat`
--   `PendingIntent`
--   `AlarmManager`
--   `getSystemService()`
--   `sendBroadcast()`
--   `MediaPlayer`
--   `startService()`
--   `stopService()`
--   `Intent.getStringExtra()`
--   `Intent.putStringExtra()`
--   `MaterialCardView`
--   `SCHEDULE_EXACT_ALARM`
+picker.show()
+```
 
-------------------------------------------------------------------------
+The current hour and minute are obtained from `Calendar.getInstance()` and used as the initial values of the picker. citeturn7view0
 
-## 📁 Updated / Added Files
+---
 
--   MainActivity.kt
--   activity_main.xml
--   AlarmService.kt
--   AlarmBroadcastReceiver.kt
--   clocks.png
--   baseline_alarm_add_24.xml
--   baseline_alarm_off_24.xml
+# 📅 Preparing the Alarm Time
 
-------------------------------------------------------------------------
+After the user selects a time, the application creates a `Calendar` object and sets:
+
+- Current year
+- Current month
+- Current date
+- Selected hour
+- Selected minute
+- Seconds = `0`
+
+```kotlin
+alarmCalendar.set(year, month, day, hour, minute, 0)
+```
+
+The resulting time is converted to milliseconds using:
+
+```kotlin
+alarmCalendar.timeInMillis
+```
+
+This value is passed to the alarm scheduling function. citeturn7view0
+
+---
+
+# ⏱️ AlarmManager & PendingIntent
+
+The project creates a broadcast `PendingIntent` targeting `AlarmBroadcastReceiver`.
+
+```kotlin
+val pendingIntent = PendingIntent.getBroadcast(
+    applicationContext,
+    23245,
+    intent,
+    PendingIntent.FLAG_IMMUTABLE
+)
+```
+
+Then `AlarmManager` is obtained from the Android system:
+
+```kotlin
+val alarmManager =
+    getSystemService(ALARM_SERVICE) as AlarmManager
+```
+
+For starting an alarm, the application checks:
+
+```kotlin
+alarmManager.canScheduleExactAlarms()
+```
+
+and schedules the alarm using:
+
+```kotlin
+alarmManager.setExact(
+    AlarmManager.RTC_WAKEUP,
+    millisTime,
+    pendingIntent
+)
+```
+
+This is the core scheduling logic implemented in the repository. citeturn7view0
+
+---
+
+# 🔐 Exact Alarm Permission
+
+The practical uses:
+
+```xml
+<uses-permission
+    android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+```
+
+If exact alarm scheduling is unavailable, the application displays a message and opens the appropriate system settings screen using `ACTION_REQUEST_SCHEDULE_EXACT_ALARM`. citeturn0view0turn7view0
+
+---
+
+# 📡 AlarmBroadcastReceiver
+
+`AlarmBroadcastReceiver` extends `BroadcastReceiver`.
+
+It reads a String extra named:
+
+```kotlin
+SERVICE_KEY = "Service1"
+```
+
+The receiver recognises two values:
+
+```kotlin
+START_VAL = "start"
+STOP_VAL = "stop"
+```
+
+When the received value is `start`, the receiver starts `AlarmService`.
+
+When the received value is `stop`, it stops `AlarmService`. citeturn5view0
+
+### Receiver Flow
+
+```text
+Alarm Broadcast
+      │
+      ▼
+AlarmBroadcastReceiver
+      │
+      ├── "start" ──► startService()
+      │
+      └── "stop"  ──► stopService()
+```
+
+---
+
+# 🔊 AlarmService
+
+`AlarmService` extends Android's `Service`.
+
+The service uses:
+
+```kotlin
+MediaPlayer.create(this, R.raw.alarm)
+```
+
+to load the alarm audio from the application's `res/raw` resources.
+
+When the service starts, it calls:
+
+```kotlin
+mp?.start()
+```
+
+When the service is destroyed, the media player is stopped:
+
+```kotlin
+mp?.stop()
+```
+
+The service returns:
+
+```kotlin
+START_STICKY
+```
+
+from `onStartCommand()`. citeturn5view1
+
+---
+
+# 🔄 Complete Alarm Flow
+
+```text
+┌──────────────────┐
+│   MainActivity   │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ TimePickerDialog │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│     Calendar     │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   AlarmManager   │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   PendingIntent  │
+└────────┬─────────┘
+         │
+         ▼
+┌────────────────────────┐
+│ AlarmBroadcastReceiver │
+└───────────┬────────────┘
+            │
+            ▼
+┌──────────────────┐
+│   AlarmService   │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   MediaPlayer    │
+│   Alarm Sound    │
+└──────────────────┘
+```
+
+The repository's implementation follows this architecture through `AlarmManager → PendingIntent → BroadcastReceiver → Service`. citeturn7view0turn5view0turn5view1
+
+---
+
+# ❌ Cancelling the Alarm
+
+The **Cancel Alarm** button calls:
+
+```kotlin
+setAlarm(0, AlarmBroadcastReceiver.STOP_VAL)
+```
+
+The alarm `PendingIntent` is cancelled using:
+
+```kotlin
+alarmManager.cancel(pendingIntent)
+```
+
+The receiver is then notified through:
+
+```kotlin
+sendBroadcast(intent)
+```
+
+and the alarm card is hidden again.
+
+The application also displays:
+
+```text
+Alarm is stopped!
+```
+
+using a Toast. citeturn7view0
+
+---
+
+# 📚 Concepts Covered
+
+| Concept | Implementation |
+|---|---|
+| Activity | `MainActivity` |
+| BroadcastReceiver | `AlarmBroadcastReceiver` |
+| Service | `AlarmService` |
+| AlarmManager | Schedules the alarm |
+| PendingIntent | Pending broadcast operation |
+| TimePickerDialog | Selects alarm time |
+| Calendar | Builds scheduled date/time |
+| MediaPlayer | Plays alarm sound |
+| MaterialCardView | Displays selected alarm |
+| MaterialButton | Set/Cancel controls |
+| Toast | Displays alarm status |
+| Edge-to-Edge | Window configuration |
+| Exact Alarm | `setExact()` |
+| Manifest Permission | `SCHEDULE_EXACT_ALARM` |
+
+---
+
+# 🛠️ Development Steps
+
+1. Create the Android project.
+2. Design the alarm screen in `activity_main.xml`.
+3. Create `MainActivity`.
+4. Add the Set Alarm and Cancel Alarm controls.
+5. Implement `TimePickerDialog`.
+6. Store the selected time in `Calendar`.
+7. Create a `PendingIntent` for `AlarmBroadcastReceiver`.
+8. Obtain `AlarmManager`.
+9. Check exact-alarm scheduling permission.
+10. Schedule the alarm with `setExact()`.
+11. Create `AlarmBroadcastReceiver`.
+12. Create `AlarmService`.
+13. Load the alarm sound using `MediaPlayer`.
+14. Implement alarm cancellation.
+15. Test both setting and cancelling the alarm.
+
+---
 
 ## ▶️ How to Run
 
-1.  Open the project in **Android Studio**.
-2.  Build and run the application.
-3.  Verify the current digital clock.
-4.  Press **Create Alarm**.
-5.  Select the required time using the Time Picker.
-6.  Confirm the selected alarm.
-7.  Verify the alarm information shown in the application.
-8.  Wait for the scheduled alarm or test it with a suitable time.
-9.  Use **Cancel Alarm** to cancel the alarm.
+1. Open the project in **Android Studio**.
+2. Allow Gradle synchronization to finish.
+3. Run the application on an Android device or emulator.
+4. Press **Create/Set Alarm**.
+5. Select the desired time.
+6. Verify that the selected alarm appears in the UI.
+7. Allow exact-alarm access if Android requests it.
+8. Test the alarm at a suitable time.
+9. Press **Cancel Alarm** to stop/cancel it.
 
-------------------------------------------------------------------------
+---
 
 ## 🖼️ OUTPUT
 <table>
@@ -204,10 +416,23 @@ The practical requires the following permission in the Android Manifest:
   </tr>
 </table>
 
-------------------------------------------------------------------------
+---
+
+## 📁 Important Files
+
+```text
+MainActivity.kt
+AlarmBroadcastReceiver.kt
+AlarmService.kt
+activity_main.xml
+AndroidManifest.xml
+res/raw/alarm
+```
+
+The first three Kotlin files are present in the repository's application package. citeturn4view0
+
+---
 
 ## ✅ Result
 
-The Android Alarm application was successfully developed using
-**Service, BroadcastReceiver, AlarmManager and PendingIntent** to create
-and cancel scheduled alarms.
+The Android Alarm application was successfully implemented using **AlarmManager, PendingIntent, BroadcastReceiver and Service**, with `MediaPlayer` used to play the alarm sound and a TimePickerDialog used to select the alarm time.
